@@ -17,20 +17,26 @@ function randomNum(minNum,maxNum){
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
-function loop_clicks(sleepMillisecond) {
+ function loop_clicks(sleepMillisecond) {
 	var count = $('button.search-result__actions--primary').not('button.message-anywhere-button').length;
 	if (count == 0) {
 		next();
 	}
 	else {
-		$('button.search-result__actions--primary').not('button.message-anywhere-button').each( function(index,element) {
-			sleep(index*randomNum(sleepMillisecond,sleepMillisecond*2));
-			click_connect($(this));
+		var totlalCount=count;
+		$('button.search-result__actions--primary').not('button.message-anywhere-button').each(async function(index,element) {
+			var name=$(this).attr('aria-label');
+            if(name.indexOf('加')>=0){
+            	var s=index*randomNum(sleepMillisecond,sleepMillisecond*2);
+				await sleep(s);
+				log(" count:"+count+" name:"+name+" index:"+index+" sleep:"+s);
+				click_connect($(this));
+            }
 			--count;
-		});
-		if (count<=0) {
+			if (count<=0){
 			next();
-		}
+			}
+		});
 	}
 }
 
@@ -49,7 +55,11 @@ var delay = ( function() {
 })();
 var sleepMillisecond=11*1000;
 function next() {
+    log('next');
 	$('button.artdeco-pagination__button--next').click();
-	delay(function(){ loop_clicks(sleepMillisecond); }, sleepMillisecond*15);
+	delay(function(){ loop_clicks(sleepMillisecond); }, sleepMillisecond*3);
+}
+function log(str){
+	console.info(new Date().toLocaleTimeString()+" "+str);
 }
 loop_clicks(sleepMillisecond);
